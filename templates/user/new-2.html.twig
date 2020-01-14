@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create User{% endblock %}
+
+{% block body %}
+    {{ form_start(userForm) }}
+    <div class="row">
+        <div class="col">
+            {{ form_row(userForm.firstName) }}
+        </div>
+        <div class="col">
+            {{ form_label(userForm.lastName) }}
+            {{ form_widget(userForm.lastName) }}
+            <span class="text-danger">{{ form_errors(userForm.lastName) }}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{ form_row(userForm.birthDate) }}
+        </div>
+    </div>
+
+    {{ form_end(userForm) }}
+{% endblock %}
