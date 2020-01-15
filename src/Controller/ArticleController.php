@@ -52,8 +52,7 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $articleData = $form->getData();
-            $this->entityManager->persist($articleData);
+            $this->entityManager->persist($article);
             $this->entityManager->flush();
 
             return $this->redirectToRoute('list_articles');
