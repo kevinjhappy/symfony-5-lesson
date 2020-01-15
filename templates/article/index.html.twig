@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ArticleController!{% endblock %}
+{% block title %}Article List{% endblock %}
 
 {% block body %}
 <style>
@@ -9,12 +9,12 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <h1>Article list</h1>
 
-    This friendly message is coming from:
     <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/project/src/Controller/ArticleController.php'|file_link(0) }}">src/Controller/ArticleController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/project/templates/article/index.html.twig'|file_link(0) }}">templates/article/index.html.twig</a></code></li>
+    {% for article in articles %}
+        <li>{{ article.title }} de {{ article.user.firstName }}</li>
+    {% endfor %}
     </ul>
 </div>
 {% endblock %}
