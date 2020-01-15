@@ -9,7 +9,9 @@ use App\Form\UserType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ArticleController extends AbstractController
@@ -43,7 +45,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/article_create", name="article_create")
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         $article = new Article();
 
@@ -52,13 +54,12 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $articleData = $form->getData();
-            $this->entityManager->persist($articleData);
+            $this->entityManager->persist($article);
             $this->entityManager->flush();
 
             return $this->redirectToRoute('list_articles');
-
         }
+
         return $this->render('article/new.html.twig', [
             'form' => $form->createView(),
         ]);
