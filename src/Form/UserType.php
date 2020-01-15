@@ -4,7 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\{DateType, EmailType, SubmitType, TextType};
+use Symfony\Component\Form\Extension\Core\Type\{DateType, EmailType, PasswordType, RepeatedType, SubmitType, TextType};
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,6 +19,11 @@ class UserType extends AbstractType
             ->add('birthDate', DateType::class, [
                 'years' => range(date('Y')-100, date('Y')),
                 'label' => 'Sélectionner une date de naissance',
+            ])
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'first_options' => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => "Répéter le mot de passe"],
             ])
             ->add('save', SubmitType::class)
         ;

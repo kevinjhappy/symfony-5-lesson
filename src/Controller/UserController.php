@@ -7,9 +7,12 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+
 
 class UserController extends AbstractController
 {
@@ -22,6 +25,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/user_list", name="user_list")
+     * @IsGranted("ROLE_USER")
      */
     public function index()
     {
@@ -35,7 +39,10 @@ class UserController extends AbstractController
     /**
      * @Route("/user-create", name="user-create")
      */
-    public function newAction(Request $request, EntityManagerInterface $entityManager)
+    public function newAction(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserPasswordEncoderInterface $passwordEncoder)
     {
         $user = new User();
 
@@ -44,15 +51,17 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // objet User rempli avec les infos du formulaire
-            $userData = $form->getData();
+//            $userData = $form->getData();
+            $password = $passwordEncoder->encodePassword($user, $user->getPassword());
+            $user->setPassword($password);
             // pas besoin de cette ligne si on injecte ENtityManagerInterface en dépendance
 //            $entityManager = $this->getDoctrine()->getManager();
             // dire à Doctrine que cet objet est nouveau
-            $entityManager->persist($userData);
+            $entityManager->persist($user);
             // enregistrer les nouveaux objets et object modifié en base de donnée
             $entityManager->flush();
 
-            return $this->redirectToRoute('user');
+            return $this->redirectToRoute('user_list');
 
         }
         return $this->render('user/new-2.html.twig', [

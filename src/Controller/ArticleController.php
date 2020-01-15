@@ -11,7 +11,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
+/**
+ * @Route("/articles")
+ */
 class ArticleController extends AbstractController
 {
     private $articleRepository;
@@ -26,7 +30,8 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * @Route("/articles", name="list_articles")
+     * @Route("/", name="list_articles", methods={"GET"})
+     * @IsGranted("ROLE_USER")
      */
     public function index()
     {
@@ -41,7 +46,7 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * @Route("/article_create", name="article_create")
+     * @Route("/create", name="article_create", methods={"GET", "POST"})
      */
     public function newAction(Request $request)
     {
