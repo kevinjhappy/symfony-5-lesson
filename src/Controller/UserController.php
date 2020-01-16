@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Event\UserRegisteredEvent;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,15 +13,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 
 class UserController extends AbstractController
 {
     private $userRepository;
+    private $eventDispatcher;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, EventDispatcherInterface $eventDispatcher)
     {
         $this->userRepository = $userRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -59,6 +63,8 @@ class UserController extends AbstractController
             $entityManager->persist($user);
             // enregistrer les nouveaux objets et object modifié en base de donnée
             $entityManager->flush();
+            $userRegisteredEvent = new UserRegisteredEvent($user);
+            $this->eventDispatcher->dispatch($userRegisteredEvent);
 
             return $this->redirectToRoute('user_list');
 
