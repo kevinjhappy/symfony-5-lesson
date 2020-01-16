@@ -8,6 +8,7 @@ use App\Form\ArticleType;
 use App\Form\UserType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,6 +48,7 @@ class ArticleController extends AbstractController
 
     /**
      * @Route("/create", name="article_create", methods={"GET", "POST"})
+     * @IsGranted("ROLE_USER")
      */
     public function newAction(Request $request)
     {
@@ -57,13 +59,63 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $article->setCreatedAt(new \DateTime());
             $this->entityManager->persist($article);
             $this->entityManager->flush();
+            $this->addFlash('notice', "L'article a bien été créé");
 
             return $this->redirectToRoute('list_articles');
-
         }
         return $this->render('article/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/delete-bis/{id}", name="article_delete_bis")
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function deleteBis(string $id, EntityManagerInterface $entityManager)
+    {
+        $article = $this->articleRepository->find($id);
+        $entityManager->remove($article);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('list_articles');
+    }
+
+    /**
+     * @Route("/delete/{id}", name="article_delete")
+     * @ParamConverter("article", options={"mapping"={"id"="id"}})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function delete(Article $article, EntityManagerInterface $entityManager)
+    {
+        $entityManager->remove($article);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('list_articles');
+    }
+
+    /**
+     * @Route("/edit/{id}", name="article_edit")
+     * @ParamConverter("article", options={"mapping"={"id"="id"}})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function update(Request $request, Article $article)
+    {
+        $form = $this->createForm(ArticleType::class, $article);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->persist($article);
+            $this->entityManager->flush();
+            $this->addFlash('notice', "L'article a bien été modifié");
+
+            return $this->redirectToRoute('list_articles');
+        }
+        return $this->render('article/edit.html.twig', [
             'form' => $form->createView(),
         ]);
     }

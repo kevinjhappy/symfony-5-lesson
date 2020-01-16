@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
@@ -40,4 +41,15 @@ class HomeController extends AbstractController
             'form' =>$form->createView(),
         ]);
     }
+
+    public function example(SessionInterface $session)
+    {
+        // donne un nom à la variable de session et une valeur
+        $session->set('toto', 3);
+
+        // récupère la valeur de la variable de session
+        $getToto = $session->get('toto');
+        // $getToto = 3
+    }
+
 }

@@ -139,6 +139,11 @@ class User implements UserInterface
         return $this;
     }
 
+    public function isArticleIsOwnedByUser(Article $article): bool
+    {
+        return $this->articles->contains($article);
+    }
+
     public function removeArticle(Article $article): self
     {
         if ($this->articles->contains($article)) {
