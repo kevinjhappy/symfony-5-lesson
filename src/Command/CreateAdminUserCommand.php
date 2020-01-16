@@ -20,7 +20,6 @@ class CreateAdminUserCommand extends Command
     private $entityManager;
     private $passwordEncoder;
 
-    // Injection de dépendance pour EntityManagerInterface et UserPasswordEncoderInterface
     public function __construct(
         string $name = null,
         EntityManagerInterface $entityManager,
@@ -28,7 +27,6 @@ class CreateAdminUserCommand extends Command
     {
         $this->entityManager = $entityManager;
         $this->passwordEncoder = $passwordEncoder;
-        // le parent construct est à laisser tel quel
         parent::__construct($name);
     }
 
@@ -46,14 +44,11 @@ class CreateAdminUserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
-        // permet de poser une question à l'utilisateur dans le terminal
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion(
-            'Confirmer la création de l\'utilisateur? [y,n]',
+            'Confirmer la création de l\'utilisateur?',
             false, '/^(y|j)/i');
 
-        // si la réponse n'est pas égale à true, on arrète la commande
         if (!$helper->ask($input, $output, $question)) {
             return 0;
         }
@@ -68,33 +63,31 @@ class CreateAdminUserCommand extends Command
         $user->setEmail($email);
         $user->setPassword($hashedPassword);
         $user->setRoles(['ROLE_ADMIN']);
-        $user->setLastName($lastName ?? '');
-        $user->setFirstName($firstName ?? '');
-//        if ($email) {
-//            $io->note(sprintf('User email: %s', $email));
-//        }
-//        if ($password) {
-//            $io->note(sprintf('User password: %s', $password));
-//        }
-//        if ($firstName) {
-//            $io->note(sprintf('User First Name: %s', $firstName));
-//            $user->setFirstName($firstName);
-//        } else {
-//            $user->setFirstName('');
-//        }
-//        if ($lastName) {
-//            $io->note(sprintf('User Last Name: %s', $lastName));
-//            $user->setLastName($lastName);
-//        } else {
-//            $user->setLastName('');
-//        }
 
-        // si l'enregistrement ne fonctionne pas, on affiche dans le terminal un message d'erreur
+        if ($email) {
+            $io->note(sprintf('User email: %s', $email));
+        }
+        if ($password) {
+            $io->note(sprintf('User password: %s', $password));
+        }
+        if ($firstName) {
+            $io->note(sprintf('User First Name: %s', $firstName));
+            $user->setFirstName($firstName);
+        } else {
+            $user->setFirstName('');
+        }
+        if ($lastName) {
+            $io->note(sprintf('User Last Name: %s', $lastName));
+            $user->setLastName($lastName);
+        } else {
+            $user->setLastName('');
+        }
         try {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         } catch (\Exception $exception) {
-            $io->error('An error occured : ' . $exception->getMessage());
+            $io->error('A error occured : ' . $exception->getMessage());
+
             return 0;
         }
 
