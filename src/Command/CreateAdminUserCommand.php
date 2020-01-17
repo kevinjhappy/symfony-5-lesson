@@ -58,30 +58,19 @@ class CreateAdminUserCommand extends Command
         $firstName = $input->getArgument('firstName');
         $lastName = $input->getArgument('lastName');
 
+        $io->note(sprintf('User email: %s', $email));
+        $io->note(sprintf('User password: %s', $password));
+        $io->note(sprintf('User First Name: %s', $firstName ?? ''));
+        $io->note(sprintf('User Last Name: %s', $lastName ?? ''));
+
         $user = new User();
         $hashedPassword = $this->passwordEncoder->encodePassword($user, $password);
         $user->setEmail($email);
         $user->setPassword($hashedPassword);
         $user->setRoles(['ROLE_ADMIN']);
+        $user->setFirstName($firstName ?? '');
+        $user->setLastName($lastName ?? '');
 
-        if ($email) {
-            $io->note(sprintf('User email: %s', $email));
-        }
-        if ($password) {
-            $io->note(sprintf('User password: %s', $password));
-        }
-        if ($firstName) {
-            $io->note(sprintf('User First Name: %s', $firstName));
-            $user->setFirstName($firstName);
-        } else {
-            $user->setFirstName('');
-        }
-        if ($lastName) {
-            $io->note(sprintf('User Last Name: %s', $lastName));
-            $user->setLastName($lastName);
-        } else {
-            $user->setLastName('');
-        }
         try {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
